@@ -1,0 +1,42 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>{{ crop.common_name }} - Details</title>
+    <style>
+        body { font-family: Arial, sans-serif; margin: 40px; }
+        .back-link { margin-bottom: 20px; display: block; }
+        table { border-collapse: collapse; width: 50%; }
+        td, th { border: 1px solid #ddd; padding: 8px; }
+        th { background-color: #f4f4f4; text-align: left; }
+    </style>
+</head>
+<body>
+    <a href="{% url 'smartfarm:crop_index' %}" class="back-link">← Back to Crop List</a>
+
+    <h1>{{ crop.scientific_name }}</h1>
+    <h3><i>{{ crop.common_name }}</i></h3>
+    {% with crop.source|cut:"http://ecoport.org/perl/ecoport15.pl?searchType=entityDisplay&entityId=" as entity_id %}
+        <img src="http://ecoport.org/EntGIFs/000000/{{ entity_id }}.jpg"
+             alt="Image of {{ crop.common_name }}"
+             style="width:138px; height:200px; object-fit:cover; margin-top:20px;">
+    {% endwith %}
+    <table>
+        <tr>
+            <th>Optimal Temperature (°C)</th>
+            <td>{{ crop.optimal_temperature_min }} - {{ crop.optimal_temperature_max }}</td>
+        </tr>
+        <tr>
+            <th>Optimal Humidity (%RH)</th>
+            <td>{{ crop.optimal_humidity_min }} - {{ crop.optimal_humidity_max }}</td>
+        </tr>
+        <tr>
+            <th>Optimal Light (LDR Analog Value)</th>
+            <td>{{ crop.optimal_light_min }} - {{ crop.optimal_light_max }}</td>
+        </tr>
+        <tr>
+            <th>Source</th>
+            <td><a href="{{ crop.source }}" target="_blank">EcoPort Link</a></td>
+        </tr>
+    </table>
+</body>
+</html>

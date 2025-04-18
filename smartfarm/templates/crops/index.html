@@ -1,0 +1,41 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>SmartFarm Crops</title>
+    <style>
+        body { font-family: Arial, sans-serif; margin: 40px; }
+        .search-box { margin-bottom: 20px; }
+        .crop-list { list-style: none; padding: 0; }
+        .crop-item { padding: 10px; border-bottom: 1px solid #ccc; }
+        a { text-decoration: none; color: #2c3e50; }
+        a:hover { color: #2980b9; }
+    </style>
+</head>
+<body>
+    <h1>SmartFarm Crop List</h1>
+
+    <form method="get" class="search-box">
+        <input type="text" name="q" placeholder="Search by common name" value="{{ query|default:'' }}">
+        <button type="submit">Search</button>
+    </form>
+
+    {% if crops %}
+        <ul class="crop-list">
+            {% for crop in crops %}
+                <li class="crop-item" style="display: flex; align-items: center; margin-bottom: 10px;">
+                    {% with crop.source|cut:"http://ecoport.org/perl/ecoport15.pl?searchType=entityDisplay&entityId=" as entity_id %}
+                        <img src="http://ecoport.org/EntGIFs/000000/{{ entity_id }}.jpg"
+                             alt="{{ crop.common_name }}"
+                             style="width: 40px; height: 58px; object-fit: cover; margin-right: 10px;">
+                    {% endwith %}
+                    <a href="{% url 'smartfarm:crop_detail' crop.id %}">
+                        {{ crop.scientific_name }}
+                    </a>
+                </li>
+            {% endfor %}
+        </ul>
+    {% else %}
+        <p>No crops found.</p>
+    {% endif %}
+</body>
+</html>
