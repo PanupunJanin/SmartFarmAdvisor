@@ -1,0 +1,66 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Crop Recommendations</title>
+    <style>
+        body { font-family: Arial, sans-serif; margin: 40px; }
+        label { font-weight: bold; }
+        ul { list-style-type: none; padding-left: 0; }
+        li { margin-bottom: 20px; display: flex; align-items: center; }
+        a { font-size: 1.2em; color: #2c3e50; text-decoration: none; }
+        a:hover { color: #27ae60; }
+        .crop-img {
+            width: 40px;
+            height: 58px;
+            object-fit: cover;
+            margin-right: 10px;
+            border-radius: 4px;
+            border: 1px solid #ccc;
+        }
+    </style>
+</head>
+<body>
+    <a href="{% url 'smartfarm:crop_index' %}" class="back-link">← Back to Crop List</a>
+    <h1>Find Suitable Crops</h1>
+
+    <form method="get">
+        <label>Temperature:</label>
+        <input type="number" step="0.1" name="temperature" value="{{ temperature }}">
+        <br>
+        <label>Humidity:</label>
+        <input type="number" step="0.1" name="humidity" value="{{ humidity }}">
+        <br>
+        <label>Light:</label>
+        <input type="number" step="0.1" name="light" value="{{ light }}">
+        <br><br>
+        <button type="submit">Get Recommendations</button>
+    </form>
+
+    {% if recommendations %}
+        <h2>Recommended Crops (Max Score: 100)</h2>
+        <ul>
+            {% for rec in recommendations %}
+                <li>
+                    {% with rec.crop.source|cut:"http://ecoport.org/perl/ecoport15.pl?searchType=entityDisplay&entityId=" as entity_id %}
+                        <img class="crop-img" src="http://ecoport.org/EntGIFs/000000/{{ entity_id }}.jpg"
+                             alt="{{ rec.crop.scientific_name }}">
+                    {% endwith %}
+                    <div>
+                        <a href="{% url 'smartfarm:crop_detail' rec.crop.id %}">
+                            {{ rec.crop.scientific_name }}
+                        </a><br>
+                        <strong>Overall Score:</strong> {{ rec.overall_score }}<br>
+                        <small>
+                            Temp Score: {{ rec.temp_score }} |
+                            Humidity Score: {{ rec.humidity_score }} |
+                            Light Score: {{ rec.light_score }}
+                        </small>
+                    </div>
+                </li>
+            {% endfor %}
+        </ul>
+    {% elif temperature %}
+        <p>No suitable crops found for the input conditions.</p>
+    {% endif %}
+</body>
+</html>

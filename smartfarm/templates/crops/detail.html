@@ -17,7 +17,7 @@
     <h3><i>{{ crop.common_name }}</i></h3>
     {% with crop.source|cut:"http://ecoport.org/perl/ecoport15.pl?searchType=entityDisplay&entityId=" as entity_id %}
         <img src="http://ecoport.org/EntGIFs/000000/{{ entity_id }}.jpg"
-             alt="Image of {{ crop.common_name }}"
+             alt="Image of {{ crop.scientific_name }}"
              style="width:138px; height:200px; object-fit:cover; margin-top:20px;">
     {% endwith %}
     <table>

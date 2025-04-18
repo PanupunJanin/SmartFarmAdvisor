@@ -1,5 +1,7 @@
 from django.views.generic import ListView, DetailView
+from django.views import View
 from django.db.models import Q
+from django.shortcuts import render
 from .models import Crop
 import pandas as pd
 import ssl
@@ -14,7 +16,9 @@ class CropListView(ListView):
     def get_queryset(self):
         query = self.request.GET.get('q')
         if query:
-            return Crop.objects.filter(Q(common_name__icontains=query))
+            return Crop.objects.filter(
+                Q(common_name__icontains=query) | Q(scientific_name__icontains=query)
+            )
         return Crop.objects.all()
 
     def get_context_data(self, **kwargs):
@@ -54,4 +58,73 @@ def get_crop_data(request):
         )
 
     return HttpResponse("Crop data imported successfully from GitHub!")
+
+
+class CropRecommendationView(View):
+    template_name = 'crops/recommend.html'
+
+    def get(self, request):
+        temperature = request.GET.get('temperature')
+        humidity = request.GET.get('humidity')
+        light = request.GET.get('light')
+
+        crops = Crop.objects.all()
+        recommendations = []
+
+        if temperature and humidity and light:
+            temperature = float(temperature)
+            humidity = float(humidity)
+            light = float(light)
+
+            for crop in crops:
+                # Temperature score
+                temp_range = crop.optimal_temperature_max - crop.optimal_temperature_min
+                if temp_range > 0:
+                    temp_score = max(0, 1 - abs(temperature - ((crop.optimal_temperature_min + crop.optimal_temperature_max) / 2)) / (temp_range / 2))
+                else:
+                    temp_score = 1 if temperature == crop.optimal_temperature_min else 0
+
+                # Humidity score
+                humidity_range = crop.optimal_humidity_max - crop.optimal_humidity_min
+                if humidity_range > 0:
+                    humidity_score = max(0, 1 - abs(humidity - ((crop.optimal_humidity_min + crop.optimal_humidity_max) / 2)) / (humidity_range / 2))
+                else:
+                    humidity_score = 1 if humidity == crop.optimal_humidity_min else 0
+
+                # Light score: full 100 if within range
+                if crop.optimal_light_min <= light <= crop.optimal_light_max:
+                    light_score = 1.0
+                else:
+                    # Penalize based on distance from nearest bound
+                    light_range = crop.optimal_light_max - crop.optimal_light_min
+                    if light < crop.optimal_light_min:
+                        dist = crop.optimal_light_min - light
+                    else:
+                        dist = light - crop.optimal_light_max
+                    # Normalize based on range, but avoid division by zero
+                    light_score = max(0, 1 - dist / (light_range / 2)) if light_range > 0 else 0
+
+                # Final scores
+                temp_percent = round(temp_score * 100, 2)
+                humidity_percent = round(humidity_score * 100, 2)
+                light_percent = round(light_score * 100, 2)
+                overall_score = round((temp_score + humidity_score + light_score) / 3 * 100, 2)
+
+                recommendations.append({
+                    'crop': crop,
+                    'overall_score': overall_score,
+                    'temp_score': temp_percent,
+                    'humidity_score': humidity_percent,
+                    'light_score': light_percent,
+                })
+
+            recommendations.sort(key=lambda x: x['overall_score'], reverse=True)
+
+        context = {
+            'recommendations': recommendations,
+            'temperature': temperature,
+            'humidity': humidity,
+            'light': light,
+        }
+        return render(request, self.template_name, context)
 

@@ -18,14 +18,14 @@
         <input type="text" name="q" placeholder="Search by common name" value="{{ query|default:'' }}">
         <button type="submit">Search</button>
     </form>
-
+    <a href="{% url 'smartfarm:recommend_crops' %}">Crop Recommendation</a>
     {% if crops %}
         <ul class="crop-list">
             {% for crop in crops %}
                 <li class="crop-item" style="display: flex; align-items: center; margin-bottom: 10px;">
                     {% with crop.source|cut:"http://ecoport.org/perl/ecoport15.pl?searchType=entityDisplay&entityId=" as entity_id %}
                         <img src="http://ecoport.org/EntGIFs/000000/{{ entity_id }}.jpg"
-                             alt="{{ crop.common_name }}"
+                             alt="{{ crop.scientific_name }}"
                              style="width: 40px; height: 58px; object-fit: cover; margin-right: 10px;">
                     {% endwith %}
                     <a href="{% url 'smartfarm:crop_detail' crop.id %}">
