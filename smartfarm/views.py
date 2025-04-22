@@ -1,7 +1,7 @@
 from django.views.generic import ListView, DetailView
 from django.views import View
 from django.db.models import Q
-from django.shortcuts import render
+from django.shortcuts import render, redirect
 from .models import Crop
 import pandas as pd
 import ssl
@@ -63,7 +63,7 @@ def get_crop_data(request):
             }
         )
 
-    return HttpResponse("Crop data imported successfully from GitHub!")
+    return redirect('smartfarm:crop_index')
 
 
 class CropRecommendationView(View):
@@ -73,7 +73,9 @@ class CropRecommendationView(View):
         temperature = request.GET.get('temperature')
         humidity = request.GET.get('humidity')
         light = request.GET.get('light')
+        wet = request.GET.get('wet')
 
+        is_wet = wet == "true"
         crops = Crop.objects.all()
         recommendations = []
 
@@ -148,6 +150,7 @@ class CropRecommendationView(View):
             'temperature': temperature,
             'humidity': humidity,
             'light': light,
+            'wet': is_wet,
         }
         return render(request, self.template_name, context)
 

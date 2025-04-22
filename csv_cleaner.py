@@ -7,10 +7,10 @@ df = pd.read_csv(
 
 light_map = {
     'very bright': 0,
-    'clear skies': 200,
-    'cloudy skies': 500,
-    'light shade': 800,
-    'dark': 1023
+    'clear skies': 1024,
+    'cloudy skies': 2048,
+    'light shade': 3072,
+    'dark': 4095
 }
 
 

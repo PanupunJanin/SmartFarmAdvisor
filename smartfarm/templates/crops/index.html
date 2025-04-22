@@ -32,6 +32,9 @@
         <button type="submit">Search</button>
     </form>
     <a href="{% url 'smartfarm:recommend_crops' %}" class="button-link">Crop Recommendation</a>
+
+    <a href="https://iot.cpe.ku.ac.th/red/b6610546312/ui/#!/1?socketid=dddeYpm5f_R6lcuyAAAK" target="_blank" rel="noopener noreferrer" class="button-link">Sensors Status</a>
+
     {% if crops %}
         <ul class="crop-list">
             {% for crop in crops %}

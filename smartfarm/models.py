@@ -3,7 +3,7 @@ from django.db import models
 
 class Crop(models.Model):
     scientific_name = models.CharField(max_length=100, blank=True, null=True)
-    common_name = models.CharField(max_length=1000, unique=True)
+    common_name = models.CharField(max_length=1000)
     optimal_temperature_min = models.FloatField()
     optimal_temperature_max = models.FloatField()
     optimal_humidity_min = models.FloatField()

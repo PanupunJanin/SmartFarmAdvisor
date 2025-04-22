@@ -32,11 +32,19 @@
         <br>
         <label>Light:</label>
         <input type="number" step="0.01" name="light" value="{{ light }}">
+        <br>
+        <label>Soil is wet:</label>
+        <input type="checkbox" name="wet" value="true" {% if wet %}checked{% endif %}>
         <br><br>
         <button type="submit">Get Recommendations</button>
     </form>
 
     {% if recommendations %}
+        {% if wet %}
+            <p style="color: green;"><strong>Soil moisture detected, ready to grow.</strong></p>
+        {% elif wet is not none %}
+            <p style="color: red;"><strong>Warning:</strong> Your soil appears to be dry. Consider watering it for optimal crop growth.</p>
+        {% endif %}
         <h2>Recommended Crops (Max Score: 100)</h2>
         <ul>
             {% for rec in recommendations %}
