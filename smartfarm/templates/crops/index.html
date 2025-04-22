@@ -9,6 +9,19 @@
         .crop-item { padding: 10px; border-bottom: 1px solid #ccc; }
         a { text-decoration: none; color: #2c3e50; }
         a:hover { color: #2980b9; }
+        .button-link {
+            display: inline-block;
+            padding: 10px 20px;
+            background-color: #27ae60;
+            color: white;
+            text-decoration: none;
+            border-radius: 5px;
+            font-weight: bold;
+            transition: background-color 0.2s ease;
+        }
+        .button-link:hover {
+            background-color: #219150;
+        }
     </style>
 </head>
 <body>
@@ -18,7 +31,7 @@
         <input type="text" name="q" placeholder="Search by common name" value="{{ query|default:'' }}">
         <button type="submit">Search</button>
     </form>
-    <a href="{% url 'smartfarm:recommend_crops' %}">Crop Recommendation</a>
+    <a href="{% url 'smartfarm:recommend_crops' %}" class="button-link">Crop Recommendation</a>
     {% if crops %}
         <ul class="crop-list">
             {% for crop in crops %}
@@ -29,7 +42,7 @@
                              style="width: 40px; height: 58px; object-fit: cover; margin-right: 10px;">
                     {% endwith %}
                     <a href="{% url 'smartfarm:crop_detail' crop.id %}">
-                        {{ crop.scientific_name }}
+                        {{ crop.scientific_name }} ({{ crop.first_common_name }})
                     </a>
                 </li>
             {% endfor %}

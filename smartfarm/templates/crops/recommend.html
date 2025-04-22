@@ -47,13 +47,51 @@
                     {% endwith %}
                     <div>
                         <a href="{% url 'smartfarm:crop_detail' rec.crop.id %}">
-                            {{ rec.crop.scientific_name }}
+                            {{ rec.crop.scientific_name }} ({{ rec.first_common_name }})
                         </a><br>
-                        <strong>Overall Score:</strong> {{ rec.overall_score }}<br>
+                        <strong>Overall Score:</strong> {{ rec.overall_score }}/100<br>
                         <small>
                             Temp Score: {{ rec.temp_score }} |
                             Humidity Score: {{ rec.humidity_score }} |
                             Light Score: {{ rec.light_score }}
+                        {% if rec.temp_score < 100 or rec.humidity_score < 100 or rec.light_score < 100 %}
+                            <div style="margin-top: 5px; font-size: 0.9em; color: #555;">
+                                <strong>Suggestions to Improve:</strong>
+                                <ul style="margin: 5px 0 0 15px;">
+                                    {% if rec.temp_score < 100 %}
+                                            {% if rec.temp_delta > 0 %}
+                                                Increase temperature toward {{ rec.optimal_temp|floatformat:1 }}°C
+                                                (Current: {{ rec.input_temp }}°C, Increase by: {{ rec.temp_delta_abs|floatformat:1 }}°C)
+                                            {% else %}
+                                                Decrease temperature toward {{ rec.optimal_temp|floatformat:1 }}°C
+                                                (Current: {{ rec.input_temp }}°C, Decrease by: {{ rec.temp_delta_abs|floatformat:1 }}°C)
+                                            {% endif %}
+                                    {% endif %}
+                                    {% if rec.humidity_score < 100 %}
+                                        <li>
+                                            {% if rec.humidity_delta > 0 %}
+                                                Increase humidity toward {{ rec.optimal_humidity|floatformat:1 }}%RH
+                                                (Current: {{ rec.input_humidity }}%RH, Increase by: {{ rec.humidity_delta_abs|floatformat:1 }}%RH)
+                                            {% else %}
+                                                Decrease humidity toward {{ rec.optimal_humidity|floatformat:1 }}%RH
+                                                (Current: {{ rec.input_humidity }}%RH, Decrease by: {{ rec.humidity_delta_abs|floatformat:1 }}%RH)
+                                            {% endif %}
+                                        </li>
+                                    {% endif %}
+                                    {% if rec.light_score < 100 %}
+                                        <li>
+                                            {% if rec.light_delta > 0 %}
+                                                Increase light LDR Value toward {{ rec.optimal_light|floatformat:1 }}
+                                                (Current: {{ rec.input_light }} LDR Value, Increase(Darker) by: {{ rec.light_delta_abs|floatformat:1 }} LDR Value)
+                                            {% else %}
+                                                Decrease light LDR Value toward {{ rec.optimal_light|floatformat:1 }}
+                                                (Current: {{ rec.input_light }} LDR Value, Decrease(Brighter) by: {{ rec.light_delta_abs|floatformat:1 }} LDR Value)
+                                            {% endif %}
+                                        </li>
+                                    {% endif %}
+                                </ul>
+                            </div>
+                        {% endif %}
                         </small>
                     </div>
                 </li>

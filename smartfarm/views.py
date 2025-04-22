@@ -15,11 +15,17 @@ class CropListView(ListView):
 
     def get_queryset(self):
         query = self.request.GET.get('q')
+        crops = Crop.objects.all()
+
         if query:
-            return Crop.objects.filter(
+            crops = crops.filter(
                 Q(common_name__icontains=query) | Q(scientific_name__icontains=query)
             )
-        return Crop.objects.all()
+
+        # Add computed field
+        for crop in crops:
+            crop.first_common_name = crop.common_name.split(',')[0].strip()
+        return crops
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
@@ -109,13 +115,30 @@ class CropRecommendationView(View):
                 humidity_percent = round(humidity_score * 100, 2)
                 light_percent = round(light_score * 100, 2)
                 overall_score = round((temp_score + humidity_score + light_score) / 3 * 100, 2)
+                optimal_temp = (crop.optimal_temperature_min + crop.optimal_temperature_max) / 2
+                optimal_humidity = (crop.optimal_humidity_min + crop.optimal_humidity_max) / 2
+                optimal_light = (crop.optimal_light_min + crop.optimal_light_max) / 2
+                first_common_name = crop.common_name.split(',')[0].strip()
 
                 recommendations.append({
                     'crop': crop,
+                    'first_common_name': first_common_name,
                     'overall_score': overall_score,
                     'temp_score': temp_percent,
                     'humidity_score': humidity_percent,
                     'light_score': light_percent,
+                    'optimal_temp': optimal_temp,
+                    'optimal_humidity': optimal_humidity,
+                    'optimal_light': optimal_light,
+                    'temp_delta': round(optimal_temp - temperature, 1),
+                    'temp_delta_abs': round(abs(optimal_temp - temperature), 1),
+                    'humidity_delta': round(optimal_humidity - humidity, 1),
+                    'humidity_delta_abs': round(abs(optimal_humidity - humidity), 1),
+                    'light_delta': round(optimal_light - light, 1),
+                    'light_delta_abs': round(abs(optimal_light - light), 1),
+                    'input_temp': temperature,
+                    'input_humidity': humidity,
+                    'input_light': light,
                 })
 
             recommendations.sort(key=lambda x: x['overall_score'], reverse=True)
