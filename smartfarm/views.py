@@ -5,7 +5,6 @@ from django.shortcuts import render, redirect
 from .models import Crop
 import pandas as pd
 import ssl
-from django.http import HttpResponse
 
 
 class CropListView(ListView):
