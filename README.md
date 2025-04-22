@@ -66,7 +66,6 @@ This local sensor data is then compared with crop-specific optimal growth requir
 4. **Run Django server:**
     ```bash
     python manage.py migrate
-    python manage.py loaddata data/smartfarm_data.json
     python manage.py runserver
     ```
 
