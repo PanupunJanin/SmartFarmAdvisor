@@ -38,5 +38,57 @@
             <td><a href="{{ crop.source }}" target="_blank">EcoPort Link</a></td>
         </tr>
     </table>
+
+    <h2>Evaluate Crop Suitability</h2>
+    <form method="get">
+        <label>Temperature:</label>
+        <input type="number" step="0.01" name="temperature" value="{{ temperature }}"><br>
+        <label>Humidity:</label>
+        <input type="number" step="0.01" name="humidity" value="{{ humidity }}"><br>
+        <label>Light (LDR Value):</label>
+        <input type="number" step="0.01" name="light" value="{{ light }}"><br>
+        <label>Soil is wet:</label>
+        <input type="checkbox" name="wet" value="true" {% if wet %}checked{% endif %}><br><br>
+        <button type="submit">Check Suitability</button>
+    </form>
+
+    {% if overall_score %}
+        <h3>Score for this Crop</h3>
+        <ul>
+            <li><strong>Temperature Score:</strong> {{ temp_score }}/100</li>
+            <li><strong>Humidity Score:</strong> {{ humidity_score }}/100</li>
+            <li><strong>Light Score:</strong> {{ light_score }}/100</li>
+            <li><strong>Overall Score:</strong> {{ overall_score }}/100</li>
+        </ul>
+
+        {% if wet %}
+            <p style="color: green;"><strong>Soil is wet: ready for planting.</strong></p>
+        {% else %}
+            <p style="color: red;"><strong>Soil is dry: consider watering before planting.</strong></p>
+        {% endif %}
+
+        <h4>Suggestions to Improve:</h4>
+        <ul>
+            {% if temp_score < 100 %}
+                <li>
+                    Adjust temperature toward {{ suggestions.temp.optimal|floatformat:2 }}°C
+                    (Current: {{ temperature }}°C)
+                </li>
+            {% endif %}
+            {% if humidity_score < 100 %}
+                <li>
+                    Adjust humidity toward {{ suggestions.humidity.optimal|floatformat:2 }}%RH
+                    (Current: {{ humidity }}%RH)
+                </li>
+            {% endif %}
+            {% if light_score < 100 %}
+                <li>
+                    Adjust light toward LDR {{ suggestions.light.optimal|floatformat:2 }}
+                    (Current: {{ light }})
+                </li>
+            {% endif %}
+        </ul>
+    {% endif %}
+
 </body>
 </html>
